@@ -4,7 +4,7 @@ use crate::config;
 
 #[derive(Debug, Parser)]
 #[command(
-  name = "ckup",
+  name = "cli-ckup",
   author = "Tsubasa Irisawa <lambdasawa@gmail.com>",
   version = "0.1.0",
   about = "CLI for clickup.com",
