@@ -1,40 +1,39 @@
+use clap::Parser;
+use std::error::Error;
+
+mod cli;
 mod client;
+mod config;
+mod handler;
 mod model;
-use reqwest::Error;
-use std::env;
+mod print;
 
-static ENV_NAME_API_KEY: &str = "CLICKUP_API_KEY";
+fn main() -> Result<(), Box<dyn Error>> {
+    let cli = cli::Cli::parse();
 
-fn main() -> Result<(), Error> {
-    let client = client::Client {
-        client: reqwest::blocking::Client::new(),
-        base_url: &client::BASE_URL.to_string(),
-        api_key: &env::var(ENV_NAME_API_KEY)
-            .expect(format!("{} environment variable not set", ENV_NAME_API_KEY).as_str()),
-    };
+    let cfg = config::from_cli(&cli);
 
-    let workspaces = client.get_workspaces()?;
+    match &cli.commands {
+        cli::Commands::User(args) => match args.commands {
+            cli::UserCommands::View {} => handler::user_view(&cfg),
+        },
 
-    let spaces = client.get_spaces(model::GetSpacesRequest {
-        team_id: workspaces.teams[0]
-            .id
-            .parse()
-            .expect("team id is not a number"),
-        archived: None,
-    })?;
+        cli::Commands::Workspace(args) => match args.commands {
+            cli::WorkspaceCommands::View {} => handler::workspace_view(&cfg),
+        },
 
-    let lists = client.get_folderless_lists(model::GetFolderlessListsRequest {
-        space_id: spaces.spaces[0]
-            .id
-            .parse()
-            .expect("space id is not a number"),
-    })?;
+        cli::Commands::Space(args) => match &args.commands {
+            cli::SpaceCommands::View(args) => handler::space_view(&cfg, args),
+        },
 
-    let response = client.get_tasks(model::GetTasksRequest {
-        list_id: lists.lists[0].id.parse().expect("list id is not a number"),
-    })?;
+        cli::Commands::List(args) => match &args.commands {
+            cli::ListCommands::View(args) => handler::list_view(&cfg, args),
+        },
 
-    println!("{:#?}", response);
+        cli::Commands::Task(args) => match &args.commands {
+            cli::TaskCommands::View(args) => handler::task_view(&cfg, args),
+        },
+    }
 
     Ok(())
 }

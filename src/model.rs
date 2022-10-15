@@ -68,7 +68,7 @@ pub struct Member {
 
 #[derive(Debug)]
 pub struct GetSpacesRequest {
-    pub team_id: u32,
+    pub workspace_id: u32,
 
     pub archived: Option<bool>,
 }
@@ -343,8 +343,9 @@ pub struct TasksResponse {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Task {
-    //    #[serde(rename = "id")]
-    //    pub id: String,
+    #[serde(rename = "id")]
+    pub id: String,
+
     #[serde(rename = "custom_id")]
     pub custom_id: Option<serde_json::Value>,
 
@@ -370,7 +371,7 @@ pub struct Task {
     pub date_updated: String,
 
     #[serde(rename = "date_closed")]
-    pub date_closed: Option<serde_json::Value>,
+    pub date_closed: Option<String>,
 
     #[serde(rename = "archived")]
     pub archived: bool,
@@ -397,10 +398,10 @@ pub struct Task {
     pub priority: Option<serde_json::Value>,
 
     #[serde(rename = "due_date")]
-    pub due_date: Option<serde_json::Value>,
+    pub due_date: Option<String>,
 
     #[serde(rename = "start_date")]
-    pub start_date: Option<serde_json::Value>,
+    pub start_date: Option<String>,
 
     #[serde(rename = "points")]
     pub points: Option<serde_json::Value>,
